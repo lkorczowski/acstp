@@ -25,9 +25,6 @@ function [Xhat ACSTPstruct]=ACSTP(EEG,ACSTPoptions)
 % Critical parameters required from the user and information :
 % -a well-chosen temporal mask for the evoked potential of interest
 % -a wel-chosen spatial mask for the evoked potential of interest
-% The estimated ERP epochs Xhat are returned such as :
-% for X the EEG epochs with corrected latencies and with weights W, the ACSTP filter, does:
-% Xhat(:,:,k)=As*Bs'*W(k)*X(:,:,k)*Bt*At';
 %
 % Actual limitations and advices :
 % -while the code was heavely tested by the authors, it is still an ongoing
@@ -41,7 +38,6 @@ function [Xhat ACSTPstruct]=ACSTP(EEG,ACSTPoptions)
 % matrices and low-frequencies implies often ill-conditionned
 % covariances matrices on short epochs. The ACSTP has shown succesful
 % results on zero-phase distorsion band-pass filtered data between [0.5-30] Hz.
-%
 %
 %
 %%%% INPUTS :
