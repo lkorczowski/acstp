@@ -200,6 +200,8 @@ ACSTPshow(EEG,ACSTPoptions,ACSTPfilter,2)
 
 % eeglab required
 if exist('readlocs')
+    % if needed, you can find the missing .locs files in ./data/loc/
+    % in the github repo and add it in the loc folder of eeglab.
     ACSTPshow(EEG,ACSTPoptions,ACSTPfilter,3)
 end
 
