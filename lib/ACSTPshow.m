@@ -17,7 +17,8 @@ function ACSTPshow(EEG,ACSTPoptions,ACSTPfilter,Type)
 %
 % INPUTS :
 %   EEG : the same structure given to ACSTP (Fs, Trigger, EpochClass,
-%         Channels as [nb samples x nb channels], ElectrodesName optional).
+%         Channels as [nb samples x nb channels]). ElectrodesName labels
+%         the channels; it is required for Type 3.
 %   ACSTPoptions : the options given to ACSTP (uses Epoch_size and,
 %         for Type 2, LatencyCorr_max).
 %   ACSTPfilter : the second output of ACSTP.

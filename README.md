@@ -152,7 +152,7 @@ In the code: `Xhat(:,:,k) = As{c}*Bs{c}'*W(k)*X(:,:,k)*Bt{c}*At{c}'`, where `X(:
 | `A_z` | `As{z}` | N × P_z | spatial patterns (scalp maps) |
 | `E_z` | `At{z}` | T × P_z | temporal patterns (time courses) |
 | `P_z` | `BestPz(z)` | scalar | subspace dimension |
-| `σ_zk` | `Weights(k)` | K × 1 | sweep weights |
+| `σ_zk` | `Weights(k)` | 1 × K | sweep weights |
 | `τ_zk` | `Latency(k)` | K × 1 | sweep time shifts (samples) |
 | `Q̂_z` | `EAcstp(:,:,z)` | N × T | filtered ensemble average |
 | `ϒ_z` (mask) | `Mask_Electrodes` × `Mask_Time` | — | spatio-temporal mask |
@@ -213,7 +213,7 @@ Then pick `P_z` from the `SNR(p)` curve and return the step-4 filters, weights a
 
 ## Requirements and installation
 
-- **MATLAB.** The old README says R2011b or later. The code is from 2015–2016, has no MEX files, and was tested by the author on Windows.
+- **MATLAB.** The old wiki says R2011b or later. The code is from 2015–2016, has no MEX files, and was tested by the author on Windows.
 - **Signal Processing Toolbox**, for `findpeaks`. It is used to choose the subspace dimension (when you test 4 or more values) and in the latency correction (when `LatencyCorr_max > 0`). It is not bundled.
 - **Curve Fitting Toolbox `smooth`:** not needed. A copy of `smooth.m` ships in `lib/compatibility/`.
 - **EEGLAB (optional).** Only `ACSTPshow(...,3)` needs it, for the topographic maps (`readlocs`, `topoplot`). Electrode location files are in `data/loc/`. Put them on the path or copy them to EEGLAB's location folder.
@@ -274,7 +274,7 @@ Both inputs are required. See [Known issues](#known-issues) for why a call with 
 | `Trigger` | samples × 1 | zeros, with a non-zero value at the **first sample of each epoch**. Only the positions are used. You can also give a vector of sample indices, one per epoch: ACSTP then converts it and warns. |
 | `EpochClass` | epochs × 1 | class label of each epoch, in the order of `Trigger` (e.g. 0 = non-target, 1 = target) |
 | `NoiseTrigger` *(optional)* | samples × 1, or indices | epoch onsets used **only** for the noise covariances (1.12). Default: the same as `Trigger`. |
-| `ElectrodesName` *(optional)* | 1 × channels cell | electrode labels, used in figures |
+| `ElectrodesName` *(optional)* | 1 × channels cell | electrode labels, used in figures. Required by `ACSTPshow(...,3)`. |
 
 Epochs start **at** the trigger: there is no pre-stimulus window. If you want a baseline period, move the triggers earlier and widen `Epoch_size` and `Mask_Time` to match (a comment in the code suggests this).
 
@@ -283,10 +283,10 @@ Epochs start **at** the trigger: there is no pre-stimulus window. If you want a 
 | Field | Default | Meaning |
 |---|---|---|
 | `Epoch_size` | **required** | epoch length `T` in samples. It must be larger than the number of channels. |
-| `LatencyCorr_max` | `0` | maximum time shift `E` in samples (±). `0` turns latency correction off. Every trigger must be at least `E` samples away from the start and the end of the recording. |
+| `LatencyCorr_max` | `0` | maximum time shift `E` in samples (±). `0` turns latency correction off. Each trigger sample `t` must satisfy `t > E` and `t + Epoch_size − 1 + E ≤` number of samples, with `E` = `LatencyCorr_max` (otherwise ERROR5/ERROR6). |
 | `Mask_Electrodes` | all channels | channel indices of the mask. Used to choose `P_z` and in latency correction. |
 | `Mask_Time` | `1:Epoch_size` | sample indices (within the epoch) of the mask |
-| `SubspaceDim` | `N:-1:N/2` | candidate subspace dimensions, **in decreasing order**, each between 1 and N. Use one value to fix `P_z`, or three or more to let ACSTP choose (see [Known issues](#known-issues) about exactly two values). |
+| `SubspaceDim` | `N:-1:N/2` | candidate subspace dimensions, **in decreasing order**, each between 1 and N. Use one value to fix `P_z`, or four or more to let ACSTP choose (with three, the middle value is always taken). See [Known issues](#known-issues) about exactly two values. |
 | `MaxIterLatency` | `10` | maximum number of latency iterations |
 | `computeClassLat` | all classes | the classes whose latencies are estimated. Latency correction is the slowest step, so skip the classes that don't need it. |
 | `Weights` | `true` | `true`: estimate weights (1.16). `false`: all weights are 1. A K × 1 vector: use these weights as given (ACSTP warns). |
@@ -307,7 +307,7 @@ Epochs start **at** the trigger: there is no pre-stimulus window. If you want a 
 | `fullBs`, `fullBt`, `fullAs`, `fullAt` | the same, keeping all components (used for display, e.g. topoplots) |
 | `BestPz` | chosen subspace dimension per class |
 | `PzSNR` | the mask SNR for every tested `SubspaceDim` (last class), after 3-point smoothing and subtraction of its minimum (raw if only one value is tested) |
-| `Weights` | K × 1 weights `σ_k` (mean 1 within each class) |
+| `Weights` | 1 × K weights `σ_k` (mean 1 within each class); a K × 1 column of ones when `Weights = false` |
 | `Latency` | K × 1 time shifts `τ_k` in samples (0 when not estimated) |
 | `Class` | sorted class labels: the order of the 3rd dimension and of the cells |
 
@@ -367,6 +367,8 @@ Data: 24 subjects, Brain Invaders P300 odd-ball (80 target and 400 non-target fl
 ![Spatial and temporal CSTP patterns for four subjects](pic/fig4_cstp_patterns.png)
 *Paper, Fig. 4. The 16 temporal patterns (columns of `E`, time series) and spatial patterns (columns of `A`, scalp maps normalized to their maximum) for subjects 8, 10, 7 and 11. For subject 8, `P_z = 14`, so components 15–16 (very slow drifts) are removed. For subject 10, `P_z = 13`, so components 14–16 are removed; they peak at the frontal pole and are most likely eye-related.*
 
+*Note: the paper's text (and Fig. 3) give `P_z` = 14 for subject 8 and 13 for subject 10, while the panel titles of Fig. 2 read ACSTP(15) and ACSTP(14) for their target class.*
+
 ![Bootstrap RMSE of AEA and ACSTP for all subjects](pic/fig5_bootstrap_rmse.png)
 *Paper, Fig. 5. Variability of the estimators: mean and 3 SD of the RMSE over 600 bootstrap resamples, by bootstrap sample size (target: 40 down to 4 sweeps; non-target: 200 down to 20). Dark grey = AEA, light grey = ACSTP. Asterisk = significant difference (paired t-test, FDR q = 0.05). ACSTP has a lower RMSE in all subjects, and the gap grows as fewer sweeps are used.*
 
@@ -380,10 +382,11 @@ Data: 24 subjects, Brain Invaders P300 odd-ball (80 target and 400 non-target fl
 These come from reading `lib/ACSTP.m` next to the paper. Nothing was run, because no MATLAB licence was available.
 
 - **Whitening threshold.** The paper keeps the eigenvalues larger than `λ₁(C_(S))/10⁶` (CSTP box; "one million times smaller" in Appendix B). The code keeps the leading eigenvectors until their cumulative eigenvalue sum reaches `(1 − 10⁻¹²)` of the total, separately for space and time.
-- **Candidate subspace dimensions.** The paper scans `p = 2…N` and chooses in `{3,…,N−1}`. The code scans only the values in `SubspaceDim` (default `N` down to `N/2`). When the list has three or more values, it never picks the first or the last one.
-- **SNR used for `P_z`.** The paper uses the ratio of *squared* Frobenius norms (1.15). The code (`best_Pz`) uses the ratio of the norms themselves, so the 66 % threshold applies to the square root of the paper's SNR. Normalization: the paper uses `(SNR − min)/max`, while the code subtracts the minimum only. The threshold is relative, so this second difference has no effect.
+- **Candidate subspace dimensions.** The paper scans `p = 2…N` and chooses in `{3,…,N−1}`. The code scans only the values in `SubspaceDim` (default `N` down to `N/2`). When the list has three or more values, it never picks the first or the last one; with exactly three it always takes the middle one (`findpeaks` only runs for more than three).
+- **SNR used for `P_z`.** The paper uses the ratio of *squared* Frobenius norms (1.15). The code (`best_Pz`) uses the ratio of the norms themselves, so the 66 % threshold applies to the square root of the paper's SNR. The threshold is also taken relative to the largest SNR among the inner values of the list, not the global maximum. Normalization: the paper uses `(SNR − min)/max`, while the code subtracts the minimum only. The threshold is relative, so this second difference has no effect.
 - **Fallback for `P_z`.** If there is no valid local maximum, the paper sets `P_z = N − 1`. The code takes the maximum of the smoothed SNR over the inner values of the list.
 - **Latency search range.** The paper evaluates shifts in `{−E−1,…,E+1}` so that a peak at `±E` can be detected. The code evaluates `−E…E`, and `findpeaks` cannot return an end point, so shifts of exactly `±E` are never chosen.
+- **Latency threshold.** The paper's "valid local maximum" uses 66 % of the global maximum. In `LatencyEstimation` the 66 % is relative to the highest peak of the (min-subtracted) covariance curve.
 - **Latency mask.** The paper applies the mask (optionally) to both the leave-one-out average and the lagged sweep. The code masks only the lagged sweep. The leave-one-out average is computed from the current, already-shifted, weighted sweeps, without a mask.
 - **Latency stopping rule.** The paper stops when `Σ_k |τ_zk| < E`, or after `i` iterations (suggested `i = 2E`). The code stops after at least two iterations when `mean_k |τ_new − τ_old| < E / K₁`, where `K₁` is the number of epochs whose label is non-zero, or after `MaxIterLatency` iterations (default 10).
 - **Noise covariances.** These match (1.12): `cov` of each original, unweighted, unshifted epoch, averaged over all classes. The code also lets you use other segments (`EEG.NoiseTrigger`). The paper recommends random EEG segments when there are few sweeps (about 40 s of EEG is enough).
@@ -398,11 +401,10 @@ These come from reading the code. They have not been re-run.
 - **`installer.m`** looks for `external/` and `scripts/` folders that are not in the repository. Nothing is added from them. MATLAB may print a warning about the missing folders. It also puts `lib/compatibility/smooth.m` on the path, which shadows the Curve Fitting Toolbox `smooth` if you have it.
 - **Signal Processing Toolbox** (`findpeaks`) is required but not checked or bundled. Without it, ACSTP fails as soon as it tests 4 or more subspace dimensions, or when `LatencyCorr_max > 0`.
 - **`ACSTP(EEG)` with one input fails.** `ACSTPoptions` is read (`isfield(ACSTPoptions,...)`) before the `nargin < 2` branch. That branch's defaults are also hard-coded for 16 channels at 128 Hz.
-- **`SubspaceDim` with exactly two values** makes `best_Pz` return an empty index and ACSTP errors. Use one value, or three or more.
+- **`SubspaceDim` with exactly two values** makes `best_Pz` return an empty index and ACSTP errors. Use one value, or four or more (with three, the middle value is always taken).
 - **Several classes:** latency estimation uses the filters of the *last* class (`Bs(end)`, `Bt(end)`) for every class in `computeClassLat`. The returned `Weights`/`Latency` are those of the last class's best `P_z` (see above). Also, the latency call passes `Bt(end)` where `At` is expected; `At` is not used inside, so this has no effect. The tutorial notes that more than 2 classes were never tested.
 - **`ACSTPshow`** Types 1–2 and the one-input call hard-code two classes labelled 0 and 1. The one-input call also assumes `EEG.Channels` is samples × channels and 1-s epochs. Type 3 has room for 16 scalp maps, so it will error with more than 16 channels. It needs `Standard-10-20-Cap81.locs` on the path and electrode names found in that file.
-- **Encoding.** `lib/ACSTPshow.m` is saved in Latin-1/Windows-1252 (the `µ` in figure annotations). On a MATLAB that reads source files as UTF-8 (the default on macOS/Linux in recent releases), the `µ` displays garbled. This is cosmetic.
-- **Line endings.** All `.m` files use Windows CRLF line endings. MATLAB doesn't care, but some diff tools show it.
+- **Encoding.** `lib/ACSTPshow.m` is saved in Latin-1/Windows-1252 (the `µ` in figure annotations). MATLAB R2020a and later read source files as UTF-8 on every platform, Windows included, so there the `µ` displays garbled. This is cosmetic.
 - **Console noise.** `MaxIterLatency` is assigned without a semicolon, so its value is printed. `DISPLAY` does nothing.
 - **Off-by-one check:** for `NoiseTrigger`, an epoch that ends exactly on the last sample is rejected (`+Window` instead of `+Window-1`).
 - **Toy data:** `EEG_ex.mat` is a MATLAB v7.3 (HDF5) file. Its first ~1,560 samples, before the first trigger, contain a very large filtering transient (up to ~6·10⁷). Epochs taken at the triggers don't touch it, but the tutorial's optional "random noise epochs" test (TEST1) can.

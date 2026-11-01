@@ -6,7 +6,7 @@ The method itself (equations, notation) is described in the [README](README.md#m
 
 > M. Congedo, L. Korczowski, A. Delorme, F. Lopes da Silva, "Spatio-temporal common pattern: A companion method for ERP analysis in the time domain", *J. Neurosci. Methods* 267:74–88, 2016. [hal-01343026](https://hal.science/hal-01343026/document)
 
-> **Note on this page.** It was written from the code, the paper and the figures in `pic/`. It was not re-run in MATLAB. The toy-data figure in step 0 was recomputed in Python from `EEG_ex.mat`. The other figures are the author's own `ACSTPshow` output or figures from the paper.
+> **Note on this page.** It was written from the code, the paper and the figures in `pic/`. It was not re-run in MATLAB. The toy-data figure in step 1 was recomputed in Python from `EEG_ex.mat`. The other figures are the author's own `ACSTPshow` output or figures from the paper.
 
 ---
 
@@ -170,7 +170,7 @@ ACSTPshow(EEG, ACSTPoptions, ACSTPfilter, 2)
 
 Three histograms: latencies of the NT epochs, latencies of the TA epochs (in samples, from −E to +E), and the weights of all epochs.
 
-- With the script's settings (`LatencyCorr_max = 0`), **both latency histograms are a single bar at 0**. Set `LatencyCorr_max = 4` to see a spread of TA latencies. NT latencies stay at 0 because `computeClassLat = 1`.
+- With the script's settings (`LatencyCorr_max = 0`) all latencies are 0, and the bin argument `-0:0` passed to `hist` is the scalar 0, which `hist` reads as a *number of bins*: the latency panels are not meaningful and this call may even fail. Check `ACSTPfilter.Latency` directly instead. With `LatencyCorr_max = 4` the bins are -4…4 and you see the spread of TA latencies. NT latencies stay at 0 because `computeClassLat = 1`.
 - The weights have mean 1 within each class. Epochs with large artifacts get small weights: the filter removes most of their energy, so the denominator of (1.16) is large.
 
 ### Type 3: the spatial and temporal patterns (EEGLAB)
@@ -263,7 +263,7 @@ If the epochs don't overlap in the original recording, you can concatenate them 
 - **Downsample.** About 128 Hz is enough for most ERP work, and it keeps `T` (samples per epoch) small. The temporal covariance is T × T.
 - **Reject only extreme artifacts**, e.g. with an amplitude threshold around ±200 µV after high-pass, or periods of lost electrode contact. ACSTP handles common blinks, eye movements and muscle bursts through the weights and the filter.
 - **Have enough noise data** for the covariances. With few epochs, add random EEG segments through `NoiseTrigger` (paper: about 40 s is enough).
-- **Epoch length > number of channels** (`T > N`), and every trigger at least `LatencyCorr_max` samples from both ends of the recording.
+- **Epoch length > number of channels** (`T > N`), and each trigger sample `t` must satisfy `t > E` and `t + Epoch_size − 1 + E ≤` number of samples, with `E` = `LatencyCorr_max`.
 
 ---
 
@@ -281,7 +281,7 @@ The mask is the one supervised choice in ACSTP. It tells the algorithm where the
 
 ### SubspaceDim
 
-- Give values **in decreasing order**: one value to fix `P`, or **three or more** to let ACSTP choose. Avoid exactly two.
+- Give values **in decreasing order**: one value to fix `P`, or **four or more** to let ACSTP choose (with three, the middle value is always taken). Avoid exactly two.
 - The first and last values are never chosen (when there are 3+). So bracket the range you expect, e.g. `N:-1:N-6` as in the script, or `N:-1:2` to follow the paper.
 - Run time grows linearly with the number of values, because each one runs the whole loop.
 - To see why a value was chosen, plot `ACSTPfilter.PzSNR` against `SubspaceDim`. It is the smoothed, minimum-subtracted mask SNR of the last class (compare with the paper's Fig. 3 in the README).
