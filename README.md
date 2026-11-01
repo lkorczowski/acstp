@@ -11,7 +11,7 @@ In one call, `ACSTP` combines four steps:
 
 This is the code behind:
 
-> M. Congedo, L. Korczowski, A. Delorme, F. Lopes da Silva, **"Spatio-temporal common pattern: A companion method for ERP analysis in the time domain"**, *Journal of Neuroscience Methods* 267:74–88, 2016. [doi:10.1016/j.jneumeth.2016.04.008](https://doi.org/10.1016/j.jneumeth.2016.04.008) · [hal-01343026](https://hal.science/hal-01343026) · [PDF](https://hal.science/hal-01343026/document)
+> M. Congedo, L. Korczowski, A. Delorme, F. Lopes da Silva, **"Spatio-temporal common pattern: A companion method for ERP analysis in the time domain"**, *Journal of Neuroscience Methods* 267:74–88, 2016. [doi:10.1016/j.jneumeth.2016.04.008](https://doi.org/10.1016/j.jneumeth.2016.04.008) · [hal-01343026](https://hal.science/hal-01343026) · [PDF](https://hal.science/hal-01343026/document) · [PDF in this repo](Congedo2016_spatio-temporal_common_pattern.pdf)
 
 ![Target (TA) and non-target (NT) ensemble averages of four subjects: arithmetic average (white) vs. ACSTP (grey). The blink at frontal electrodes in ss8 and ss10 TA is removed by ACSTP.](pic/fig2_ensemble_averages.png)
 *Paper, Fig. 2. Arithmetic ensemble average (AEA, white panels) and ACSTP estimate (grey panels; the chosen subspace dimension is in brackets) of 80 target (top) and 400 non-target (bottom) sweeps for four subjects. The eye artifacts that survive averaging in subjects 8 and 10 (Fp1, Fp2) are removed by ACSTP. For clean subjects (7, 11) the two estimates are close. The shaded plots are the global field power.*
@@ -222,7 +222,7 @@ Then pick `P_z` from the `SNR(p)` curve and return the step-4 filters, weights a
 **Install**
 
 ```matlab
-% 1. download or clone https://github.com/lkorczowski/acstp
+% 1. download or clone https://github.com/lkorczowski/adaptive-common-spatio-temporal-pattern-matlab
 % 2. in MATLAB, from the repository folder:
 installer        % adds the repository root, data/ and lib/ (with subfolders) to the path
 ```

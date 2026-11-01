@@ -8,7 +8,7 @@ authors:
     affiliation: "GIPSA-lab, CNRS, Univ. Grenoble Alpes"
 version: "0.9"
 date-released: "2016-05-04"
-repository-code: "https://github.com/lkorczowski/acstp"
+repository-code: "https://github.com/lkorczowski/adaptive-common-spatio-temporal-pattern-matlab"
 keywords:
   - EEG
   - ERP
