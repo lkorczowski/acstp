@@ -1,5 +1,30 @@
 function h=plotEEG(sig,Scale,fs,LABELS,FontSize,Color,Marker,LineStyle,LineWidth)
-%h=plotEEG(sig,Scale,fs,LABELS,FontSize,Color,Marker,LineStyle)
+%PLOTEEG Plot multichannel EEG as stacked traces, one row per channel.
+%   h = plotEEG(sig)
+%   h = plotEEG(sig, Scale, fs, LABELS, FontSize, Color, Marker, LineStyle, LineWidth)
+%
+%   INPUTS :
+%       sig : [nb channels x nb samples] signal (e.g. one ensemble average).
+%             The first channel is drawn at the top. Positive is up.
+%       Scale* : half the vertical space given to each channel, in the
+%             units of sig. Default: abs(max(sig(:))), the largest sample value.
+%       fs* : sampling rate in Hz, used for the time axis in seconds.
+%             Default: 128.
+%       LABELS* : channel names, {nb channels x 1} cell or column vector.
+%             Default: 1:nb channels.
+%       FontSize* : axis font size. Default: 24.
+%       Color* : line color, RGB triplet. Default: [.1 .1 .1].
+%       Marker* : line marker. Default: 'none'.
+%       LineStyle* : line style. Default: '-'.
+%       LineWidth* : line width. Default: 1.
+%   *optional, pass [] to keep the default
+%
+%   OUTPUT :
+%       h : handles of the plotted lines
+%
+%   Example:
+%       plotEEG(ACSTPfilter.EAcstp(:,:,2), [], EEG.Fs, EEG.ElectrodesName')
+%
 % *** History: 19-Mar-2015
 % *** Author: Louis KORCZOWSKI, GIPSA-Lab, 2015
 % *** Related work: M. CONGEDO, L. KORCZOWSKI, A. DELORME, F. LOPES DA SILVA "Spatio-Temporal Common Pattern a Reference Companion Method for ERP Analysis" (submitted)

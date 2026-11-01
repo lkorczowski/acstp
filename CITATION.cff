@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the article below."
+title: "ACSTP: Adaptive Common Spatio-Temporal Pattern for ERP estimation (MATLAB)"
+type: software
+authors:
+  - family-names: Korczowski
+    given-names: Louis
+    affiliation: "GIPSA-lab, CNRS, Univ. Grenoble Alpes"
+version: "0.9"
+date-released: "2016-05-04"
+repository-code: "https://github.com/lkorczowski/adaptive-common-spatio-temporal-pattern-matlab"
+keywords:
+  - EEG
+  - ERP
+  - event-related potentials
+  - P300
+  - ensemble average
+  - artifact removal
+  - spatio-temporal filtering
+  - latency correction
+  - single-trial
+  - brain-computer interface
+  - MATLAB
+preferred-citation:
+  type: article
+  title: "Spatio-temporal common pattern: A companion method for ERP analysis in the time domain"
+  authors:
+    - family-names: Congedo
+      given-names: Marco
+    - family-names: Korczowski
+      given-names: Louis
+    - family-names: Delorme
+      given-names: Arnaud
+    - family-names: Lopes da Silva
+      given-names: Fernando
+  journal: "Journal of Neuroscience Methods"
+  volume: 267
+  start: 74
+  end: 88
+  year: 2016
+  doi: "10.1016/j.jneumeth.2016.04.008"
+  url: "https://hal.science/hal-01343026"
