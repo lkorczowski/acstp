@@ -1,30 +1,50 @@
 function [Emean Class]=meanOverlap(E,Flash,Window,TAG,Weights,doregression)
-%[Emean Class]=meanOverlap(E,Flash,Window,TAG,Weights)
-% Ensemble Averaging of the EEG data E with
-% overlapping samples for z classes using multivariate
+%MEANOVERLAP Ensemble average of epochs that may overlap (regression or arithmetic).
+%   [Emean, Class] = meanOverlap(E, Flash, Window)
+%   [Emean, Class] = meanOverlap(E, Flash, Window, TAG, Weights, doregression)
+%
+%   If any two consecutive epochs overlap (onset(k)+Window > onset(k+1)),
+%   the averages of all classes are estimated jointly by least-squares
+%   multivariate regression on the continuous signal (eq. 1.9 of Congedo et
+%   al. 2016): Emean = E*T'*pinv(T*T'), where T is the stacked Toeplitz
+%   design matrix of all classes, holding the epoch weights. Each class
+%   average is then rescaled by j_z = sum(w.^2)/sum(w). Otherwise (or if
+%   doregression is 0) it returns the arithmetic mean of the weighted epochs.
 %
 %   INPUTS :
-%       E : the EEG data matrix,  size [nb electrodes x nb samples]
-%       Flash : a zero vector with only 1 at the initial sample for each epoch, size [nb samples]
-%               for weighted epochs, replace 1 by the weight of each epoch
-%       Window : a scalar giving the length of the epochs
-%       TAG* : in case of several classes, TAG is a vector of the length of the
-%           number of 1 contained in Flash.
-%       Weights* : a vector of the size of TAG for weightened epochs
+%       E : continuous EEG, size [nb electrodes x nb samples]
+%       Flash : trigger vector of length [nb samples], non-zero at the first
+%               sample of each epoch. Only the positions are used (find(Flash));
+%               the values are ignored, so pass epoch weights in Weights.
+%       Window : scalar, epoch length in samples
+%       TAG* : class label of each epoch, vector of length nnz(Flash).
+%              Default: all ones (one class).
+%       Weights* : weight of each epoch, vector of length nnz(Flash).
+%              Default: all ones.
+%       doregression* : 1 (default) to use the regression when epochs
+%              overlap, 0 to always use the arithmetic mean. The regression
+%              is skipped automatically (with a warning) when
+%              Window * nb classes > 1024, to limit memory use.
 %   *optional
 %
-%   Output :
-%       Emean : the matrix containing the ensemble average for each class,
-%           with size [nb electrodes x (Window) x(nb classes)] with the 3rth dim sorted in
-%           order with the output Class
-%       Class : this output give the order of each class in Emean
+%   OUTPUTS :
+%       Emean : ensemble average of each class, size
+%               [nb electrodes x Window x nb classes], 3rd dimension sorted
+%               as in Class
+%       Class : the sorted class labels, unique(TAG)
 %
+%   Example (two classes, 1 s epochs, EEG struct as in the ACSTP tutorial):
+%       [ERP, Class] = meanOverlap(EEG.Channels', EEG.Trigger, EEG.Fs, EEG.EpochClass);
+%
+%   Note: ACSTP.m uses its own nested copy of this function; this file is
+%   used by ACSTPshow(EEG) and can be called directly.
 %
 % *** History: 2015-10-28
 % *** Author: Louis KORCZOWSKI, GIPSA-Lab, 2015
-% *** Related work: M. CONGEDO, L. KORCZOWSKI, A. DELORME, F. LOPES DA SILVA "Spatio-Temporal Common Pattern a Reference Companion Method for ERP Analysis" (submitted)
+% *** Related work: M. CONGEDO, L. KORCZOWSKI, A. DELORME, F. LOPES DA SILVA "Spatio-temporal
+% common pattern: A companion method for ERP analysis in the time domain", J. Neurosci. Methods, 2016
 %
-% see also: script_meanOverlap, tuto_meanOverlap
+% see also: ACSTP, ACSTPshow
 if nargin<6 || isempty(doregression)
     %by default, it will use the regression to estimate the EAE
     doregression=1;

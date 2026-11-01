@@ -11,6 +11,29 @@ function ACSTPshow(EEG,ACSTPoptions,ACSTPfilter,Type)
 %      2: latencies and Weights
 %      3: Filters components topoplot (WARNING : will create one figure of each class, eeglab REQUIRED)
 %
+% ACSTPshow(EEG) alone plots the regression-based ensemble average
+% (meanOverlap, 1 s epochs) of class 0 (red) and class 1 (blue) on top of
+% each other. Use it to check the EEG structure and to choose the masks.
+%
+% INPUTS :
+%   EEG : the same structure given to ACSTP (Fs, Trigger, EpochClass,
+%         Channels as [nb samples x nb channels], ElectrodesName optional).
+%   ACSTPoptions : the options given to ACSTP (uses Epoch_size and,
+%         for Type 2, LatencyCorr_max).
+%   ACSTPfilter : the second output of ACSTP.
+%   Type* : 1 (default), 2 or 3, see above.
+%
+% Limitations: Types 1 and 2 (and the one-input call) assume exactly two
+% classes labelled 0 (NT) and 1 (TA). Type 3 needs EEGLAB (readlocs,
+% topoplot), the file Standard-10-20-Cap81.locs on the path (see data/loc)
+% and electrode names found in that file; its layout has room for 16
+% spatial maps.
+%
+% Example:
+%   [Xhat, ACSTPfilter] = ACSTP(EEG, ACSTPoptions);
+%   figure; ACSTPshow(EEG, ACSTPoptions, ACSTPfilter)     % averages
+%   figure; ACSTPshow(EEG, ACSTPoptions, ACSTPfilter, 2)  % latencies, weights
+%
 % *** History: 29-Oct-2015
 % *** Author: Louis KORCZOWSKI, GIPSA-Lab, 2015
 % *** Related work: M. CONGEDO, L. KORCZOWSKI, A. DELORME, F. LOPES DA SILVA "Spatio-Temporal Common Pattern a Reference Companion Method for ERP Analysis" (submitted)
