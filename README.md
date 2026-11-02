@@ -16,6 +16,8 @@ This is the code behind:
 ![Target (TA) and non-target (NT) ensemble averages of four subjects: arithmetic average (white) vs. ACSTP (grey). The blink at frontal electrodes in ss8 and ss10 TA is removed by ACSTP.](pic/fig2_ensemble_averages.png)
 *Paper, Fig. 2. Arithmetic ensemble average (AEA, white panels) and ACSTP estimate (grey panels; the chosen subspace dimension is in brackets) of 80 target (top) and 400 non-target (bottom) sweeps for four subjects. The eye artifacts that survive averaging in subjects 8 and 10 (Fp1, Fp2) are removed by ACSTP. For clean subjects (7, 11) the two estimates are close. The shaded plots are the global field power.*
 
+🐍 **Python:** the ACSTP single-trial latency correction is reimplemented in [`cajd`](https://github.com/lkorczowski/composite-joint-diagonalization) (`cajd.estimate_latencies`, and `max_shift` in its `CAJD` estimators), and the composite spatio-temporal model of the follow-up paper is in [composite-joint-diagonalization-matlab](https://github.com/lkorczowski/composite-joint-diagonalization-matlab).
+
 **New here? Start with the [step-by-step tutorial](TUTORIAL.md).** It walks through `tutorial/script_ACSTP_test.m` on the toy dataset, explains every option, and shows what the figures should look like, so you can follow it without MATLAB.
 
 **Keywords:** EEG · MEG · ERP · event-related potentials · P300 · odd-ball · ensemble average · artifact removal · eye blinks · spatio-temporal filtering · bilinear filter · common spatial pattern (CSP) · xDAWN · latency correction · Woody · single-trial · trial weighting · overlapping ERPs · regression-based averaging · brain-computer interface (BCI) · MATLAB
